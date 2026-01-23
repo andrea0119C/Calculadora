@@ -4,7 +4,10 @@
  */
 package com.mycompany.orbitix.vista;
 
+import java.awt.event.ActionListener;
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -29,6 +32,41 @@ public class VistaFacturacion extends javax.swing.JFrame {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
         
+    }
+    public JButton getBtnImprimirFactura() {
+        return btnImprimirFactura;
+    }
+
+    public JButton getBtnImprimirTicket() {
+        return btnImprimirTicket;
+    }
+    
+    public JButton getBtnImprimirAmbos() {
+        return btnImprimirAmbos;
+    }
+    
+    public JButton getBtnContinuarCompra() {
+        return btnContinuarCompra;
+    }
+
+    public void addBtnImprimirFacturaListener(ActionListener listener) {
+        btnImprimirFactura.addActionListener(listener);
+    }
+    
+    public void addBtnImprimirTicketListener(ActionListener listener) {
+        btnImprimirTicket.addActionListener(listener);
+    }
+    
+    public void addBtnImprimirAmbosListener(ActionListener listener) {
+        btnImprimirAmbos.addActionListener(listener);
+    }
+    
+    public void addBtnContinuarCompraListener(ActionListener listener) {
+        btnContinuarCompra.addActionListener(listener);
+    }
+    
+    public void mostrarMensaje(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje);
     }
 
     /**

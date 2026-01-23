@@ -44,6 +44,7 @@ public class LoginControlador {
             vista.mostrarMensaje("Bienvenido: " + user.getNombre());
 
             VistaPrincipal principal = new VistaPrincipal(user);
+            new com.mycompany.orbitix.controlador.VistaPrincipalControlador(principal, user);
             principal.setVisible(true);
             vista.cerrar();
 
@@ -64,13 +65,11 @@ public class LoginControlador {
     }
 
     private void volver() {
-    // 1. Crear la vista de inicio
+  
     VistaInicio inicio = new VistaInicio();
     
-   
     new com.mycompany.orbitix.controlador.InicioControlador(inicio);
-    
-    // 3. Mostrar y cerrar
+  
     inicio.setVisible(true);
     vista.cerrar();
 }

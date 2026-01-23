@@ -7,11 +7,12 @@ package com.mycompany.orbitix.controlador;
 import com.mycompany.orbitix.datos.RepositorioArchivos;
 import com.mycompany.orbitix.modelo.Usuario;
 import com.mycompany.orbitix.modelo.Vuelo;
-import com.mycompany.orbitix.vista.VistaMapaAsientos;
+import com.mycompany.orbitix.vista.VistaMapaAsientos; 
 import com.mycompany.orbitix.vista.VistaPrincipal;
-
 import java.text.SimpleDateFormat;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -27,13 +28,24 @@ public class VistaPrincipalControlador {
         this.usuario = usuario;
         this.repo = new RepositorioArchivos();
         this.vuelos = repo.cargarVuelos();
-
-        inicializar();
+        llenarCombos();
         eventos();
     }
+    private void llenarCombos() {
+        vista.getCbselorigen().removeAllItems();
+        vista.getCbseldestino().removeAllItems();
 
-    private void inicializar() {
-        vista.setVisible(true);
+        Set<String> origenes = new HashSet<>();
+        Set<String> destinos = new HashSet<>();
+        for (Vuelo v : vuelos) {
+            if (v.getRuta() != null) {
+                origenes.add(v.getRuta().getOrigen());
+                destinos.add(v.getRuta().getDestino());
+            }
+        }
+
+        for (String o : origenes) vista.getCbselorigen().addItem(o);
+        for (String d : destinos) vista.getCbseldestino().addItem(d);
     }
 
     private void eventos() {
@@ -43,18 +55,24 @@ public class VistaPrincipalControlador {
     }
 
     private void buscarVuelos() {
+        if (vista.getCbselorigen().getSelectedItem() == null || 
+            vista.getCbseldestino().getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(vista, "No hay rutas disponibles para buscar.");
+            return;
+        }
+
         String origen = vista.getCbselorigen().getSelectedItem().toString();
         String destino = vista.getCbseldestino().getSelectedItem().toString();
 
-        DefaultTableModel modelo =
-                (DefaultTableModel) vista.getTablaVuelos().getModel();
-        modelo.setRowCount(0);
+        DefaultTableModel modelo = (DefaultTableModel) vista.getTablaVuelos().getModel();
+        modelo.setRowCount(0); 
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        boolean encontrado = false;
 
         for (Vuelo v : vuelos) {
-            if (v.getRuta().getOrigen().equals(origen)
-                    && v.getRuta().getDestino().equals(destino)) {
+            if (v.getRuta().getOrigen().equalsIgnoreCase(origen) && 
+                v.getRuta().getDestino().equalsIgnoreCase(destino)) {
 
                 modelo.addRow(new Object[]{
                         v.getCodigo(),
@@ -64,7 +82,12 @@ public class VistaPrincipalControlador {
                         v.getRuta().getDuracionFormateada(),
                         v.getAsientosDisponibles()
                 });
+                encontrado = true;
             }
+        }
+        
+        if (!encontrado) {
+            JOptionPane.showMessageDialog(vista, "No se encontraron vuelos para esa ruta.");
         }
     }
 
@@ -84,19 +107,16 @@ public class VistaPrincipalControlador {
                 .orElse(null);
 
         if (seleccionado != null) {
-            new VistaMapaAsientos(vista, seleccionado, usuario).setVisible(true);
-            vista.setVisible(false);
+             JOptionPane.showMessageDialog(vista, "Vuelo seleccionado: " + seleccionado.getCodigo() + "\nIr a Mapa de Asientos...");
+             
+             VistaMapaAsientos mapa = new VistaMapaAsientos(vista, seleccionado, usuario); 
+             mapa.setVisible(true);
+             vista.dispose();
         }
     }
 
     private void salir() {
-        int confirm = JOptionPane.showConfirmDialog(
-                vista,
-                "¿Está seguro que desea salir?",
-                "Orbitix",
-                JOptionPane.YES_NO_OPTION
-        );
-
+        int confirm = JOptionPane.showConfirmDialog(vista, "¿Está seguro que desea salir?", "Orbitix", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             System.exit(0);
         }

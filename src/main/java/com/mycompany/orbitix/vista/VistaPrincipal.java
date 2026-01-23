@@ -18,7 +18,7 @@ import java.util.logging.Logger;
  */
 public class VistaPrincipal extends javax.swing.JFrame {
     private static final Logger logger =
-        Logger.getLogger(VistaPrincipal.class.getName());
+    Logger.getLogger(VistaPrincipal.class.getName());
     public Usuario usuarioLogueado;
     public List<Vuelo> listaVuelosActuales;
     public RepositorioArchivos repo = new RepositorioArchivos();
@@ -253,7 +253,16 @@ public class VistaPrincipal extends javax.swing.JFrame {
             logger.log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
+         try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception ex) {
+            java.util.logging.Logger.getLogger(VistaPrincipal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new VistaPrincipal().setVisible(true));
     }
