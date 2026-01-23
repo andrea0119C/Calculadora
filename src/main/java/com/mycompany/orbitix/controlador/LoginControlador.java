@@ -28,7 +28,7 @@ public class LoginControlador {
         this.vista = vista;
         this.usuarioControlador = new UsuarioControlador();
 
-        // 🔹 REGISTRAR ACTION LISTENERS 🔹
+        
         this.vista.addIngresarListener(e -> login());
         this.vista.addVolverListener(e -> volver());
     }
@@ -64,8 +64,14 @@ public class LoginControlador {
     }
 
     private void volver() {
-        VistaInicio inicio = new VistaInicio();
-        inicio.setVisible(true);
-        vista.cerrar();
-    }
+    // 1. Crear la vista de inicio
+    VistaInicio inicio = new VistaInicio();
+    
+   
+    new com.mycompany.orbitix.controlador.InicioControlador(inicio);
+    
+    // 3. Mostrar y cerrar
+    inicio.setVisible(true);
+    vista.cerrar();
+}
 }
