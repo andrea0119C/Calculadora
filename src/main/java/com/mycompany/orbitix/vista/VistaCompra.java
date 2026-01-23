@@ -4,6 +4,8 @@
  */
 package com.mycompany.orbitix.vista;
 
+import com.mycompany.orbitix.modelo.MetodoPago;
+import com.mycompany.orbitix.modelo.PagoTarjeta;
 import com.mycompany.orbitix.modelo.Pasaje;
 import com.mycompany.orbitix.modelo.Usuario;
 import com.mycompany.orbitix.modelo.Vuelo;
@@ -268,74 +270,87 @@ public class VistaCompra extends javax.swing.JFrame {
     }//GEN-LAST:event_txtNumTarjeta1ActionPerformed
 
     private void btnPagarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPagarActionPerformed
-                                       
+        // 1. Validaciones iniciales
     if (usuarioLogueado == null) {
         JOptionPane.showMessageDialog(this, "Error: Sesión no válida.");
         return;
     }
 
+    // Usamos el campo txtNumTarjeta1 que es el que definiste en tu diseño para el número
     if (txtNumTarjeta1.getText().trim().isEmpty() || txtCVV.getText().trim().isEmpty()) {
         JOptionPane.showMessageDialog(this, "Por favor, complete los datos de su tarjeta.");
         return;
     }
 
     try {
-        // 1. Crear la compra vinculada al usuario logueado
+        // 2. Crear la compra vinculada al usuario logueado
         String codigoCompra = "C-" + (int) (Math.random() * 10000);
         com.mycompany.orbitix.modelo.Compra nuevaCompra = new com.mycompany.orbitix.modelo.Compra(codigoCompra, usuarioLogueado);
 
-        // 2. CAMBIO CLAVE: Usar la lista de objetos Pasaje que recibiste en el constructor
-        // Ya no calculamos precios ni creamos pasajeros, solo los agregamos a la compra
-        for (com.mycompany.orbitix.modelo.Pasaje p : pasajes) {
-            nuevaCompra.agregarPasaje(p);
+        // Agregamos los pasajes que recibimos en el constructor
+        if (pasajes != null) {
+            for (com.mycompany.orbitix.modelo.Pasaje p : pasajes) {
+                nuevaCompra.agregarPasaje(p);
+            }
         }
 
-        // 3. Crear y procesar el pago
-        String idPago = "PAG-" + System.currentTimeMillis() % 10000;
+        // 3. Configuración del Pago (Patrón Strategy)
+        // CORRECCIÓN: Declaramos idPago antes de usarla
+        String idPago = "PAG-" + (System.currentTimeMillis() % 10000);
+        
+        com.mycompany.orbitix.modelo.MetodoPago metodoSeleccionado = new com.mycompany.orbitix.modelo.PagoTarjeta(); 
+
         com.mycompany.orbitix.modelo.Pago objetoPago = new com.mycompany.orbitix.modelo.Pago(
                 idPago,
                 nuevaCompra.getTotal(),
                 new java.util.Date(),
-                com.mycompany.orbitix.modelo.MetodoPago.TARJETA
+                metodoSeleccionado 
         );
 
-        nuevaCompra.setPago(objetoPago);
-        objetoPago.procesarPago(); 
+        // 4. Procesar el pago
+        boolean pagoExitoso = objetoPago.procesarPago();
 
-        // 4. Guardar en el archivo
-        com.mycompany.orbitix.datos.RepositorioArchivos repo = new com.mycompany.orbitix.datos.RepositorioArchivos();
-        repo.guardarCompra(nuevaCompra);
-        
-        String numFactura = "FAC-" + (System.currentTimeMillis() % 100000);
+        if (pagoExitoso) {
+            nuevaCompra.setPago(objetoPago);
+            
+            // 5. Persistencia y Documentación
+            com.mycompany.orbitix.datos.RepositorioArchivos repo = new com.mycompany.orbitix.datos.RepositorioArchivos();
+            repo.guardarCompra(nuevaCompra);
+            
+            // Generar Factura
+            String numFactura = "FAC-" + (System.currentTimeMillis() % 100000);
+            String facturaTxt = com.mycompany.orbitix.util.GenerarFactura.generarFactura(
+                    numFactura, usuarioLogueado, vuelo, pasajes
+            );
 
-// 1) Generar factura
-String facturaTxt = com.mycompany.orbitix.util.GenerarFactura.generarFactura(
-        numFactura, usuarioLogueado, vuelo, pasajes
-);
+            // Guardar factura en archivo físico
+            String nombreArchivo = "factura_" + numFactura + ".txt";
+            repo.guardarFacturaTxt(nombreArchivo, facturaTxt);
 
-// 2) Guardar factura en .txt
-String nombreArchivo = "factura_" + numFactura + ".txt";
-repo.guardarFacturaTxt(nombreArchivo, facturaTxt);
+            // 6. Interfaz de usuario: Mostrar factura
+            javax.swing.JTextArea area = new javax.swing.JTextArea(facturaTxt);
+            area.setEditable(false);
+            area.setFont(new java.awt.Font("Monospaced", java.awt.Font.PLAIN, 12));
+            javax.swing.JScrollPane sp = new javax.swing.JScrollPane(area);
+            sp.setPreferredSize(new java.awt.Dimension(650, 450));
+            
+            JOptionPane.showMessageDialog(this, sp, "Factura Generada", JOptionPane.INFORMATION_MESSAGE);
+            
+            // 7. Mensaje de éxito final y redirección
+            JOptionPane.showMessageDialog(this, "¡Compra Exitosa!\nCódigo de Compra: " + codigoCompra + "\nTotal: $" + String.format("%.2f", nuevaCompra.getTotal()));
 
-// 3) Mostrar factura en pantalla
-javax.swing.JTextArea area = new javax.swing.JTextArea(facturaTxt);
-area.setEditable(false);
-javax.swing.JScrollPane sp = new javax.swing.JScrollPane(area);
-sp.setPreferredSize(new java.awt.Dimension(650, 450));
-javax.swing.JOptionPane.showMessageDialog(this, sp, "Factura generada (Guardada en " + nombreArchivo + ")", javax.swing.JOptionPane.INFORMATION_MESSAGE);
-
-
-        // 5. Finalizar
-        JOptionPane.showMessageDialog(this, "¡Compra Exitosa!\nCódigo: " + codigoCompra + "\nTotal pagado: $" + nuevaCompra.getTotal());
-
-        new VistaPrincipal(usuarioLogueado).setVisible(true);
-        this.dispose();
+            // Volver a la vista principal
+            new VistaPrincipal(usuarioLogueado).setVisible(true);
+            this.dispose();
+            
+        } else {
+            JOptionPane.showMessageDialog(this, "El pago ha sido rechazado por la entidad bancaria.");
+        }
 
     } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, "Error al procesar la compra: " + e.getMessage());
+        JOptionPane.showMessageDialog(this, "Error crítico al procesar la compra: " + e.getMessage());
         e.printStackTrace();
     }
-
     }//GEN-LAST:event_btnPagarActionPerformed
 
     /**
