@@ -8,45 +8,31 @@ import com.mycompany.orbitix.modelo.*;
 import com.mycompany.orbitix.controlador.PasajeControlador;
 import java.util.*;
 import javax.swing.*;
+import com.mycompany.orbitix.modelo.Vuelo;
 
 /**
  * Vista de Registro de Pasajeros - Orbitix
  * @author karla (Modificado)
  */
-public class VistaRegistroPasajero extends javax.swing.JDialog {
-
-    private List<String> asientos;
+public class VistaRegistroPasajero extends javax.swing.JDialog{
     private Vuelo vuelo;
-    private int indiceActual = 0;
-    private List<Pasaje> pasajesRegistrados = new ArrayList<>();
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(VistaRegistroPasajero.class.getName());
     private Usuario usuarioLogueado;
-    
-    private boolean esNombreValido(String texto) {
-    return texto != null && texto.matches("^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]+$");
-}
+    private List<String> asientosSeleccionados = new ArrayList<>();
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(VistaRegistroPasajero.class.getName());
 
-    private boolean esNumero10Digitos(String texto) {
-        return texto != null && texto.matches("^\\d{10}$");
-    }
-
-    private boolean esEdadValida(String texto) {
-        return texto != null && texto.matches("^\\d+$");
-    }
-
-    private boolean esEmailValido(String texto) {
-        return texto != null && texto.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$");
-    }
-
-
-public VistaRegistroPasajero(java.awt.Frame parent, Vuelo vuelo, List<String> asientos, boolean modal, Usuario usuario) {
+     public VistaRegistroPasajero(JFrame parent, Vuelo vuelo, List<String> asientos, boolean modal, Usuario usuario) {
         super(parent, modal);
         this.vuelo = vuelo;
-        this.asientos = asientos;
-        this.usuarioLogueado = usuario; // Ahora 'usuario' sí existe como parámetro
-
-
-        initComponents(); 
+        this.asientosSeleccionados = asientos;
+        this.usuarioLogueado = usuario;
+        initComponents();
+        
+        CBEquipaje.removeAllItems();
+        CBEquipaje.addItem("Maleta de mano");
+        CBEquipaje.addItem("Maleta de Bodega");
+        CBEquipaje.addItem("Artículo personal");
+        CBEquipaje.setSelectedIndex(0);
+        
         Fondo fondo = new Fondo("/recursos/fondo_vPrincipal_orbitix.png");
         fondo.setLayout(new java.awt.BorderLayout());
         setContentPane(fondo);
@@ -54,44 +40,9 @@ public VistaRegistroPasajero(java.awt.Frame parent, Vuelo vuelo, List<String> as
         fondo.add(panelPrincipal, java.awt.BorderLayout.CENTER);
          
         setLocationRelativeTo(null);
-        
-        configurarComboBox();
-        configurarDiseno();
-        
-        if (panelPrincipal != null) {
-            panelPrincipal.setOpaque(false);
-            fondo.add(panelPrincipal, java.awt.BorderLayout.CENTER);
-        }
-
-        setContentPane(fondo);
-        this.setSize(1000, 700);
-        this.setLocationRelativeTo(null);
-
-        if (asientos == null || asientos.isEmpty()) {
-            JOptionPane.showMessageDialog(parent, "Error: no se recibieron asientos seleccionados", "Error", JOptionPane.ERROR_MESSAGE);
-            dispose();
-            return;
-        }
-
-        cargarDatosVuelo();
-        actualizarInterfaz();
     }
-
-    private void configurarComboBox() {
-        CBEquipaje.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{
-            "Artículo personal",
-            "Maleta de mano",
-            "Maleta de Bodega"
-        }));
-    }
-
-    private void configurarDiseno() {
-        panelPrincipal.setOpaque(false);
-        jPanel2.setOpaque(false);
-        jPanel3.setOpaque(false);
-    }
-
-    private void cargarDatosVuelo() {
+     
+      public void setInfoVuelo(Vuelo vuelo) {
         if (vuelo != null && vuelo.getRuta() != null) {
             lblInfoVuelo.setText("Vuelo: " + vuelo.getCodigo());
             lblInfoOrigen.setText("Origen: " + vuelo.getRuta().getOrigen());
@@ -99,40 +50,57 @@ public VistaRegistroPasajero(java.awt.Frame parent, Vuelo vuelo, List<String> as
         }
     }
 
-    private void actualizarInterfaz() {
-        if (asientos == null || asientos.isEmpty()) {
-            lblAsiento.setText("No hay asientos");
-            return;
+    public void actualizarInterfaz(List<Pasaje> pasajes, int indice, List<String> asientos) {
+        if (indice < asientos.size()) {
+            lblAsiento.setText(asientos.get(indice));
         }
 
-        lblAsiento.setText("Asiento: " + asientos.get(indiceActual));
+        if (indice < pasajes.size()) {
+            Pasaje p = pasajes.get(indice);
+            txtNombre.setText(p.getPasajero().getNombre());
+            txtApellido.setText(p.getPasajero().getApellido());
+            txtCedula.setText(p.getPasajero().getCedula());
+            txtTelefono.setText(p.getPasajero().getTelefono());
+            txtEmail.setText(p.getPasajero().getEmail());
+            txtEdad.setText(String.valueOf(p.getPasajero().getEdad()));
+            CBEquipaje.setSelectedItem(p.getEquipaje().getTipo().toString().replace("_"," "));
+        } else {
+            txtNombre.setText(""); txtApellido.setText(""); txtCedula.setText("");
+            txtTelefono.setText(""); txtEmail.setText(""); txtEdad.setText("");
+            CBEquipaje.setSelectedIndex(0);
+        }
 
-       
-        txtNombre.setText("");
-        txtApellido.setText("");
-        txtCedula.setText("");
-        txtTelefono.setText("");
-        txtEmail.setText("");
-        txtEdad.setText("");
-        CBEquipaje.setSelectedIndex(0);
-
-        btnAnterior.setEnabled(indiceActual > 0);
-        btnSiguiente.setText(indiceActual == asientos.size() - 1 ? "FINALIZAR COMPRA" : "SIGUIENTE");
+        btnAnterior.setEnabled(indice > 0);
+        btnSiguiente.setText(indice == asientos.size() - 1 ? "FINALIZAR COMPRA" : "SIGUIENTE");
     }
 
-private void finalizarVenta() {
-    PasajeControlador control = new PasajeControlador();
-    boolean exito = control.registrarVentaTotal(pasajesRegistrados);
-    
-    if (exito) {
-        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-
-        VistaCompra vistaPago = new VistaCompra(parentFrame, vuelo, pasajesRegistrados, usuarioLogueado);
-        
-        vistaPago.setVisible(true);
-        this.dispose();
+    public JButton getBtnAnterior() {
+        return btnAnterior;
     }
-}
+    public JButton getBtnSiguiente(){
+        return btnSiguiente;
+    }
+    public Pasajero capturarPasajero() {
+        String nombre = txtNombre.getText().trim();
+        String apellido = txtApellido.getText().trim();
+        String cedula = txtCedula.getText().trim();
+        String telefono = txtTelefono.getText().trim();
+        String email = txtEmail.getText().trim();
+        int edad = Integer.parseInt(txtEdad.getText().trim());
+        return new Pasajero(cedula, nombre, apellido, telefono, email, edad);
+    }
+    public Equipaje capturarEquipaje() {
+        String sel = CBEquipaje.getSelectedItem().toString();
+        TipoEquipaje tipo = switch(sel) {
+            case "Maleta de mano" -> TipoEquipaje.MALETA_MANO;
+            case "Maleta de Bodega" -> TipoEquipaje.MALETA_BODEGA;
+            default -> TipoEquipaje.ARTICULO_PERSONAL;
+        };
+        return new Equipaje(tipo);
+    }
+
+
+
     
 
     /**
@@ -413,144 +381,11 @@ private void finalizarVenta() {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAnteriorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAnteriorActionPerformed
-        if (indiceActual > 0) {
-                indiceActual--;
-                actualizarInterfaz();
 
-                Pasaje p = pasajesRegistrados.get(indiceActual);
-
-
-                txtNombre.setText(p.getPasajero().getNombre());
-                txtApellido.setText(p.getPasajero().getApellido());
-                txtCedula.setText(p.getPasajero().getCedula());
-                txtTelefono.setText(p.getPasajero().getTelefono());
-                txtEmail.setText(p.getPasajero().getEmail());
-                txtEdad.setText(String.valueOf(p.getPasajero().getEdad()));
-
-                TipoEquipaje tipo = p.getEquipaje().getTipo();
-                if (tipo == TipoEquipaje.MALETA_MANO) CBEquipaje.setSelectedItem("Maleta de mano");
-                else if (tipo == TipoEquipaje.MALETA_BODEGA) CBEquipaje.setSelectedItem("Maleta de Bodega");
-                else CBEquipaje.setSelectedItem("Artículo personal");
-        }
     }//GEN-LAST:event_btnAnteriorActionPerformed
 
     private void btnSiguienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSiguienteActionPerformed
-                                        
-        try {
 
-            String nombre = txtNombre.getText().trim();
-            String apellido = txtApellido.getText().trim();
-            String cedula = txtCedula.getText().trim();
-            String telefono = txtTelefono.getText().trim();
-            String email = txtEmail.getText().trim();
-            String edadStr = txtEdad.getText().trim();
-            String textoEquipaje = CBEquipaje.getSelectedItem().toString();
-
-            if (nombre.isEmpty() || apellido.isEmpty() || cedula.isEmpty() || edadStr.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Por favor, complete los campos obligatorios.");
-                return;
-            }
-
-            if (!esNombreValido(nombre)) {
-                JOptionPane.showMessageDialog(this, "El nombre solo debe contener letras.");
-                txtNombre.requestFocus();
-                return;
-            }
-
-            if (!esNombreValido(apellido)) {
-               JOptionPane.showMessageDialog(this, "El apellido solo debe contener letras.");
-               txtApellido.requestFocus();
-               return;
-            }
-
-            if (!esNumero10Digitos(cedula)) {
-               JOptionPane.showMessageDialog(this, "La cédula debe tener 10 dígitos.");
-               txtCedula.requestFocus();
-               return;
-            }
-
-
-            if (!esNumero10Digitos(telefono)) {
-               JOptionPane.showMessageDialog(this, "El celular debe tener 10 dígitos.");
-               txtTelefono.requestFocus();
-               return;
-            }
-
-            if (!esEmailValido(email)) {
-               JOptionPane.showMessageDialog(this, "Correo inválido. Debe ser por ejemplo: user@gmail.com");
-               txtEmail.requestFocus();
-               return;
-            }
-
-            if (!esEdadValida(edadStr)) {
-               JOptionPane.showMessageDialog(this, "La edad solo debe contener números.");
-               txtEdad.requestFocus();
-               return;
-            }
-
-            int edad = Integer.parseInt(edadStr);
-            Pasajero pasajero = new Pasajero(cedula, nombre, apellido, telefono, email, edad);
-
-
-            TipoEquipaje tipoEnum;
-            if (textoEquipaje.equals("Maleta de mano")) tipoEnum = TipoEquipaje.MALETA_MANO;
-            else if (textoEquipaje.equals("Maleta de Bodega")) tipoEnum = TipoEquipaje.MALETA_BODEGA;
-            else tipoEnum = TipoEquipaje.ARTICULO_PERSONAL;
-
-            Equipaje objetoEquipaje = new Equipaje(tipoEnum);
-
-
-            String codigoTkt = "TKT-" + System.currentTimeMillis() + "-" + (indiceActual + 1);
-String nombreAsiento = asientos.get(indiceActual);
-
-// Lógica para determinar la clase según la fila del asiento
-            ClaseAsiento claseReal;
-            try {
-              
-                int fila = Integer.parseInt(nombreAsiento.substring(1));
-
-                if (fila <= 2) {
-                    claseReal = ClaseAsiento.PRIMERA_CLASE;
-                } else if (fila <= 5) {
-                    claseReal = ClaseAsiento.EJECUTIVA;
-                } else {
-                    claseReal = ClaseAsiento.ECONOMICA;
-                }
-            } catch (Exception e) {
-                // Por si el formato del asiento es inesperado
-                claseReal = ClaseAsiento.ECONOMICA;
-            }
-
-            // Ahora creamos el pasaje con 'claseReal' en lugar de ECONOMICA fija
-            Pasaje p = new Pasaje(
-                codigoTkt, 
-                vuelo.getPrecio(), 
-                nombreAsiento, 
-                claseReal, // <--- CAMBIO AQUÍ
-                pasajero, 
-                vuelo, 
-                objetoEquipaje
-            );
-
-
-            if (indiceActual < pasajesRegistrados.size()) {
-                pasajesRegistrados.set(indiceActual, p);
-            } else {
-                pasajesRegistrados.add(p);
-            }
-
-
-            if (indiceActual < asientos.size() - 1) {
-                indiceActual++;
-                actualizarInterfaz();
-            } else {
-                finalizarVenta();
-            }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "La edad debe ser un número válido.");
-    }
-
-    
     }//GEN-LAST:event_btnSiguienteActionPerformed
 
     private void CBEquipajeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CBEquipajeActionPerformed
@@ -584,8 +419,7 @@ java.awt.EventQueue.invokeLater(new Runnable() {
     public void run() {
         Vuelo vuelo = new Vuelo(); 
         List<String> asientos = new java.util.ArrayList<>();
-        
-        // Creamos un usuario ficticio o nulo para que el constructor acepte la llamada
+       
         com.mycompany.orbitix.modelo.Usuario usuarioDummy = null; 
 
         // Agregamos el 5to parámetro al final
@@ -594,8 +428,10 @@ java.awt.EventQueue.invokeLater(new Runnable() {
             vuelo,
             asientos,
             true,
-            usuarioDummy // <--- ESTE ES EL 5TO PARÁMETRO QUE FALTABA
+            usuarioDummy 
         );
+        
+        new PasajeControlador(dialog, vuelo, asientos, usuarioDummy);
 
         dialog.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
@@ -633,7 +469,7 @@ java.awt.EventQueue.invokeLater(new Runnable() {
     private javax.swing.JTextField txtNombre;
     private javax.swing.JTextField txtTelefono;
     // End of variables declaration//GEN-END:variables
-
-
+ 
 }
+
 

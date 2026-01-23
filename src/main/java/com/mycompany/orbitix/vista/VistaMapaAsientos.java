@@ -82,24 +82,29 @@ public class VistaMapaAsientos extends JDialog {
         }
 
         btnConfirmar.addActionListener(e -> {
-            if (asientosSeleccionados.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Debe elegir al menos un asiento.");
-            } else {
-                JFrame framePadre = (JFrame) SwingUtilities.getWindowAncestor(this);
+    if (asientosSeleccionados.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Debe elegir al menos un asiento.");
+    } else {
+        JFrame framePadre = (JFrame) SwingUtilities.getWindowAncestor(this);
+        VistaRegistroPasajero vistaRegistro = new VistaRegistroPasajero(
+                framePadre, 
+                vuelo, 
+                asientosSeleccionados, 
+                true,
+                usuarioLogueado 
+        );
 
-                // Pasamos 5 parámetros: el último es el usuarioLogueado
-                VistaRegistroPasajero vistaRegistro = new VistaRegistroPasajero(
-                        framePadre, 
-                        vuelo, 
-                        asientosSeleccionados, 
-                        true,
-                        usuarioLogueado // <--- ASEGÚRATE DE AGREGAR ESTO
-                );
+        new com.mycompany.orbitix.controlador.PasajeControlador(
+                vistaRegistro, 
+                vuelo, 
+                asientosSeleccionados, 
+                usuarioLogueado
+        );
 
-                this.dispose(); 
-                vistaRegistro.setVisible(true); 
-            }
-        });
+        this.dispose(); 
+        vistaRegistro.setVisible(true); 
+    }
+});
 
         JPanel panelLeyenda = new JPanel();
         panelLeyenda.add(new JLabel("Dorado: 1ra Clase | Celeste: Ejecutiva | Verde: Económica | Rojo: Ocupado"));
