@@ -13,6 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
 
 public class VistaCompra extends JFrame {
 
@@ -32,8 +33,33 @@ public class VistaCompra extends JFrame {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
     }
+public void cargarResumen(java.util.List<Pasaje> pasajes) {
+    javax.swing.table.DefaultTableModel modelo = new javax.swing.table.DefaultTableModel();
+    modelo.addColumn("Pasajero");
+    modelo.addColumn("Asiento");
+    modelo.addColumn("Precio");
 
+    double totalCalculado = 0;
 
+    if (pasajes != null) {
+        for (Pasaje p : pasajes) {
+            double precioFinal = p.getPrecio() + p.getRecargo();
+            totalCalculado += precioFinal;
+            
+            modelo.addRow(new Object[]{
+                p.getPasajero().getNombre(),
+                p.getAsiento(),
+                String.format("%.2f", precioFinal)
+            });
+        }
+    }
+    jTable1.setModel(modelo);
+    System.out.println("Total calculado: " + totalCalculado);
+}
+
+    public void setTotalTexto(String total) {
+    System.out.println("Total a pagar: " + total); 
+    }
     public String getCodigoCompra() {
         return txtCodigoCompra.getText();
     }
@@ -46,17 +72,8 @@ public class VistaCompra extends JFrame {
         return btnPagar;
     }
 
-    public JButton getBtnCancelarCompra() {
-        return btnCancelarCompra;
-    }
-
-
     public void addBtnPagarListener(ActionListener l) {
         btnPagar.addActionListener(l);
-    }
-
-    public void addBtnCancelarCompraListener(ActionListener l) {
-        btnCancelarCompra.addActionListener(l);
     }
 
     public String getCodigo() {
@@ -202,7 +219,7 @@ public class VistaCompra extends JFrame {
                             .addComponent(txtCVV, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnPagar)
-                .addContainerGap())
+                .addGap(22, 22, 22))
         );
         panelTarjetaLayout.setVerticalGroup(
             panelTarjetaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -211,24 +228,29 @@ public class VistaCompra extends JFrame {
                 .addGroup(panelTarjetaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(rbVisa)
                     .addComponent(rbMasterCard))
-                .addGap(12, 12, 12)
-                .addGroup(panelTarjetaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(labelNumTarjeta1)
-                    .addComponent(txtNumTarjeta1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelTarjetaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(labelNomTitular)
-                    .addComponent(txtNumTarjeta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelTarjetaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(labelFecha)
-                    .addComponent(txtFecha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelTarjetaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(labelCVV)
-                    .addComponent(txtCVV, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnPagar))
-                .addContainerGap(36, Short.MAX_VALUE))
+                .addGroup(panelTarjetaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelTarjetaLayout.createSequentialGroup()
+                        .addGap(12, 12, 12)
+                        .addGroup(panelTarjetaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(labelNumTarjeta1)
+                            .addComponent(txtNumTarjeta1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(panelTarjetaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(labelNomTitular)
+                            .addComponent(txtNumTarjeta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(panelTarjetaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(labelFecha)
+                            .addComponent(txtFecha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(panelTarjetaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(labelCVV)
+                            .addComponent(txtCVV, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap(42, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelTarjetaLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnPagar)
+                        .addGap(16, 16, 16))))
         );
 
         javax.swing.GroupLayout panelCompraFinalLayout = new javax.swing.GroupLayout(panelCompraFinal);
@@ -239,11 +261,11 @@ public class VistaCompra extends JFrame {
                 .addGap(393, 393, 393)
                 .addGroup(panelCompraFinalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(panelTarjeta, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 497, Short.MAX_VALUE)
                     .addGroup(panelCompraFinalLayout.createSequentialGroup()
                         .addGap(136, 136, 136)
                         .addComponent(labeltargeta)))
-                .addContainerGap(515, Short.MAX_VALUE))
+                .addContainerGap(470, Short.MAX_VALUE))
             .addGroup(panelCompraFinalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(panelCompraFinalLayout.createSequentialGroup()
                     .addGap(441, 441, 441)
@@ -259,7 +281,7 @@ public class VistaCompra extends JFrame {
                 .addComponent(labeltargeta)
                 .addGap(18, 18, 18)
                 .addComponent(panelTarjeta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(11, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(panelCompraFinalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(panelCompraFinalLayout.createSequentialGroup()
                     .addGap(51, 51, 51)
@@ -292,7 +314,7 @@ public class VistaCompra extends JFrame {
     }//GEN-LAST:event_txtNumTarjeta1ActionPerformed
 
     private void btnPagarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPagarActionPerformed
-    
+        // TODO add your handling code here:
     }//GEN-LAST:event_btnPagarActionPerformed
 
     /**

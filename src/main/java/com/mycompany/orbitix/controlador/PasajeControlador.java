@@ -89,8 +89,30 @@ public class PasajeControlador {
     }
 
     private void finalizarRegistro() {
+    try {
+        System.out.println("Intentando finalizar registro...");
+
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(vistaRegistro);
-        JOptionPane.showMessageDialog(parentFrame, "Registro de pasajeros finalizado.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        
+    
+        if (vuelo == null) System.out.println("¡ALERTA! El vuelo es NULL");
+        if (usuario == null) System.out.println("¡ALERTA! El usuario es NULL");
+        if (pasajesRegistrados == null) System.out.println("¡ALERTA! La lista de pasajes es NULL");
+
+      
+        VistaCompra vistaCompra = new VistaCompra(parentFrame, vuelo, pasajesRegistrados, usuario);
+        System.out.println("Creando controlador de compra...");
+        new CompraControlador(vistaCompra, usuario, vuelo, pasajesRegistrados);
+        System.out.println("Abriendo ventana...");
         vistaRegistro.dispose();
+        vistaCompra.setVisible(true);
+        
+    } catch (Exception e) {
+        e.printStackTrace(); 
+        JOptionPane.showMessageDialog(vistaRegistro, 
+            "Error al abrir la ventana de compra:\n" + e.toString(), 
+            "Error Crítico", 
+            JOptionPane.ERROR_MESSAGE);
+       }
     }
 }

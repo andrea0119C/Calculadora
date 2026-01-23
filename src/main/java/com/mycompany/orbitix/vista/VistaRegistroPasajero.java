@@ -3,7 +3,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JDialog.java to edit this template
  */
 package com.mycompany.orbitix.vista;
-
 import com.mycompany.orbitix.modelo.*;
 import com.mycompany.orbitix.controlador.PasajeControlador;
 import java.util.*;

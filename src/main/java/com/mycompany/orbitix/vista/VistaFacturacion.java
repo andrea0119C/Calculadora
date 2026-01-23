@@ -46,11 +46,7 @@ public class VistaFacturacion extends javax.swing.JFrame {
     public JButton getBtnImprimirTicket() {
         return btnImprimirTicket;
     }
-    
-    public JButton getBtnImprimirAmbos() {
-        return btnImprimirAmbos;
-    }
-    
+
     public JButton getBtnContinuarCompra() {
         return btnContinuarCompra;
     }
@@ -61,10 +57,6 @@ public class VistaFacturacion extends javax.swing.JFrame {
     
     public void addBtnImprimirTicketListener(ActionListener listener) {
         btnImprimirTicket.addActionListener(listener);
-    }
-    
-    public void addBtnImprimirAmbosListener(ActionListener listener) {
-        btnImprimirAmbos.addActionListener(listener);
     }
     
     public void addBtnContinuarCompraListener(ActionListener listener) {
@@ -89,11 +81,9 @@ public class VistaFacturacion extends javax.swing.JFrame {
         panelBotones = new javax.swing.JPanel();
         btnImprimirFactura = new javax.swing.JButton();
         btnImprimirTicket = new javax.swing.JButton();
-        btnImprimirAmbos = new javax.swing.JButton();
         btnContinuarCompra = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(1360, 677));
 
         panelFacturacion.setBackground(new java.awt.Color(153, 0, 153));
         panelFacturacion.setPreferredSize(new java.awt.Dimension(1360, 677));
@@ -118,21 +108,13 @@ public class VistaFacturacion extends javax.swing.JFrame {
         btnImprimirTicket.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 3, true));
         btnImprimirTicket.addActionListener(this::btnImprimirTicketActionPerformed);
 
-        btnImprimirAmbos.setBackground(new java.awt.Color(102, 0, 102));
-        btnImprimirAmbos.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        btnImprimirAmbos.setForeground(new java.awt.Color(255, 255, 255));
-        btnImprimirAmbos.setText("Imprimir Ambos");
-        btnImprimirAmbos.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 3, true));
-        btnImprimirAmbos.addActionListener(this::btnImprimirAmbosActionPerformed);
-
         javax.swing.GroupLayout panelBotonesLayout = new javax.swing.GroupLayout(panelBotones);
         panelBotones.setLayout(panelBotonesLayout);
         panelBotonesLayout.setHorizontalGroup(
             panelBotonesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelBotonesLayout.createSequentialGroup()
                 .addGap(66, 66, 66)
-                .addGroup(panelBotonesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnImprimirAmbos, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(panelBotonesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(btnImprimirTicket, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnImprimirFactura, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(68, Short.MAX_VALUE))
@@ -140,13 +122,11 @@ public class VistaFacturacion extends javax.swing.JFrame {
         panelBotonesLayout.setVerticalGroup(
             panelBotonesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelBotonesLayout.createSequentialGroup()
-                .addGap(21, 21, 21)
+                .addGap(43, 43, 43)
                 .addComponent(btnImprimirFactura, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addGap(29, 29, 29)
                 .addComponent(btnImprimirTicket, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(btnImprimirAmbos, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(26, Short.MAX_VALUE))
+                .addContainerGap(60, Short.MAX_VALUE))
         );
 
         btnContinuarCompra.setBackground(new java.awt.Color(102, 0, 102));
@@ -211,11 +191,6 @@ public class VistaFacturacion extends javax.swing.JFrame {
 
     private void btnImprimirTicketActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImprimirTicketActionPerformed
 
-    if (pasajes == null || pasajes.isEmpty()) {
-        mostrarMensaje("No hay pasajes para imprimir ticket.");
-        return;
-    }
-
     StringBuilder sb = new StringBuilder();
     for (com.mycompany.orbitix.modelo.Pasaje p : pasajes) {
         sb.append(com.mycompany.orbitix.util.Ticket.generarBoardingPass(p)).append("\n");
@@ -227,10 +202,6 @@ public class VistaFacturacion extends javax.swing.JFrame {
             "Ticket(s) de vuelo", javax.swing.JOptionPane.INFORMATION_MESSAGE);
 
     }//GEN-LAST:event_btnImprimirTicketActionPerformed
-
-    private void btnImprimirAmbosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImprimirAmbosActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnImprimirAmbosActionPerformed
 
     private void btnContinuarCompraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnContinuarCompraActionPerformed
         // TODO add your handling code here:
@@ -263,7 +234,6 @@ public class VistaFacturacion extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnContinuarCompra;
-    private javax.swing.JButton btnImprimirAmbos;
     private javax.swing.JButton btnImprimirFactura;
     private javax.swing.JButton btnImprimirTicket;
     private javax.swing.JLabel laberagradecimiento;
