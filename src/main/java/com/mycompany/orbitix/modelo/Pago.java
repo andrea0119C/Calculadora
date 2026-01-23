@@ -10,7 +10,7 @@ public class Pago {
     private String id;
     private double monto;
     private Date fecha;
-    private MetodoPago metodo; 
+    private MetodoPago metodo;
 
     public Pago(String id, double monto, Date fecha, MetodoPago metodo) {
         this.id = id;
@@ -20,11 +20,7 @@ public class Pago {
     }
 
     public boolean procesarPago() {
-        if (monto > 0 && metodo != null) {
-            System.out.println("Procesando pago de $" + monto + " vía " + metodo);
-            return true;
-        }
-        return false;
+        return metodo.procesar(monto);
     }
 
 
