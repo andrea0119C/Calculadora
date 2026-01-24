@@ -86,9 +86,9 @@ public class VistaPrincipal extends javax.swing.JFrame {
         btnSalir = new javax.swing.JButton();
         labeldestino1 = new javax.swing.JLabel();
         labeldestino2 = new javax.swing.JLabel();
+        btnhistorial = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(1360, 677));
 
         panelPrincipal.setBackground(new java.awt.Color(51, 0, 51));
         panelPrincipal.setPreferredSize(new java.awt.Dimension(1360, 677));
@@ -150,17 +150,24 @@ public class VistaPrincipal extends javax.swing.JFrame {
         labeldestino2.setForeground(new java.awt.Color(255, 255, 255));
         labeldestino2.setText("Fecha:");
 
+        btnhistorial.setBackground(new java.awt.Color(153, 0, 255));
+        btnhistorial.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnhistorial.setForeground(new java.awt.Color(255, 255, 255));
+        btnhistorial.setText("HISTORIAL");
+
         javax.swing.GroupLayout panelPrincipalLayout = new javax.swing.GroupLayout(panelPrincipal);
         panelPrincipal.setLayout(panelPrincipalLayout);
         panelPrincipalLayout.setHorizontalGroup(
             panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelPrincipalLayout.createSequentialGroup()
+                .addGap(533, 533, 533)
+                .addComponent(btnSelecComprar)
+                .addContainerGap(717, Short.MAX_VALUE))
+            .addGroup(panelPrincipalLayout.createSequentialGroup()
                 .addGroup(panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panelPrincipalLayout.createSequentialGroup()
                         .addGap(424, 424, 424)
-                        .addComponent(labelsaludo, javax.swing.GroupLayout.PREFERRED_SIZE, 471, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(124, 124, 124)
-                        .addComponent(btnSalir))
+                        .addComponent(labelsaludo, javax.swing.GroupLayout.PREFERRED_SIZE, 471, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(panelPrincipalLayout.createSequentialGroup()
                         .addGap(55, 55, 55)
                         .addGroup(panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -176,44 +183,48 @@ public class VistaPrincipal extends javax.swing.JFrame {
                                     .addComponent(labeldestino1)
                                     .addComponent(labeldestino2))
                                 .addGap(193, 193, 193)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addGroup(panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panelPrincipalLayout.createSequentialGroup()
-                        .addGap(533, 533, 533)
-                        .addComponent(btnSelecComprar)))
-                .addContainerGap(269, Short.MAX_VALUE))
+                        .addGap(124, 124, 124)
+                        .addComponent(btnSalir))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelPrincipalLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnhistorial)
+                        .addGap(251, 251, 251))))
         );
         panelPrincipalLayout.setVerticalGroup(
             panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelPrincipalLayout.createSequentialGroup()
                 .addGroup(panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panelPrincipalLayout.createSequentialGroup()
-                        .addGap(58, 58, 58)
-                        .addComponent(btnSalir)
-                        .addGap(45, 45, 45))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelPrincipalLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(labelsaludo, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
-                .addGroup(panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(labelorigen1)
-                    .addComponent(labelvenco1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(labelorigen1)
+                            .addComponent(labelvenco1)
+                            .addComponent(btnhistorial))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(panelPrincipalLayout.createSequentialGroup()
+                                .addGap(18, 18, 18)
+                                .addComponent(cbselorigen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(32, 32, 32)
+                                .addComponent(labeldestino1)
+                                .addGap(33, 33, 33)
+                                .addComponent(cbseldestino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(43, 43, 43)
+                                .addComponent(labeldestino2)
+                                .addGap(150, 150, 150)
+                                .addComponent(btnBuscarVuelos))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                        .addGap(34, 34, 34)
+                        .addComponent(btnSelecComprar))
                     .addGroup(panelPrincipalLayout.createSequentialGroup()
-                        .addGap(18, 18, 18)
-                        .addComponent(cbselorigen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(32, 32, 32)
-                        .addComponent(labeldestino1)
-                        .addGap(33, 33, 33)
-                        .addComponent(cbseldestino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(43, 43, 43)
-                        .addComponent(labeldestino2)
-                        .addGap(150, 150, 150)
-                        .addComponent(btnBuscarVuelos))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                .addGap(34, 34, 34)
-                .addComponent(btnSelecComprar)
-                .addContainerGap(43, Short.MAX_VALUE))
+                        .addGap(58, 58, 58)
+                        .addComponent(btnSalir)))
+                .addContainerGap(72, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -293,6 +304,7 @@ public class VistaPrincipal extends javax.swing.JFrame {
     private javax.swing.JButton btnBuscarVuelos;
     private javax.swing.JButton btnSalir;
     private javax.swing.JButton btnSelecComprar;
+    private javax.swing.JButton btnhistorial;
     private javax.swing.JComboBox<String> cbseldestino;
     private javax.swing.JComboBox<String> cbselorigen;
     private javax.swing.JScrollPane jScrollPane1;
