@@ -47,4 +47,29 @@ public class HistorialVuelo {
                 Double.parseDouble(p[6])
         );
     }
+
+    public String getCodigoVuelo() { 
+        return codigoVuelo; 
+    }
+    
+    public String getOrigen() { 
+        return origen; 
+    }
+    
+    public String getDestino() { 
+        return destino; 
+    }
+    
+    public String getFecha() { 
+        return fecha; 
+    }
+    
+    public String getAsiento() { 
+        return asiento; 
+    }
+    
+    public double getTotalPagado() { 
+        return totalPagado; 
+    }
+   
 }

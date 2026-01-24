@@ -13,7 +13,7 @@ import com.mycompany.orbitix.modelo.Usuario;
 
 public class UsuarioControlador {
  private RepositorioArchivos repo = new RepositorioArchivos();
-
+   private static Usuario usuarioActual;
    
     public boolean existeCorreo(String email) {
  
@@ -40,8 +40,22 @@ public class UsuarioControlador {
     }
 
     public Usuario login(String email, String pass) {
-        if (email.isEmpty() || pass.isEmpty()) return null;
-        return repo.autenticarUsuario(email.trim(), pass.trim());
+    if (email.isEmpty() || pass.isEmpty()) return null;
+
+    Usuario u = repo.autenticarUsuario(email.trim(), pass.trim());
+
+    if (u != null) {
+        usuarioActual = u; 
+    }
+
+    return u;
+    }
+    public static Usuario getUsuarioActual() {
+    return usuarioActual;
+    }
+
+    public static void cerrarSesion() {
+    usuarioActual = null;
     }
 }
 

@@ -12,6 +12,14 @@ import javax.swing.JFrame;
 import java.util.logging.Logger;
 import com.github.lgooddatepicker.components.DatePicker;
 import com.github.lgooddatepicker.components.DatePickerSettings;
+import com.mycompany.orbitix.controlador.HistorialControlador;
+import com.mycompany.orbitix.controlador.UsuarioControlador;
+import com.mycompany.orbitix.modelo.HistorialVuelo;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
+
 
 
 /**
@@ -154,6 +162,7 @@ public class VistaPrincipal extends javax.swing.JFrame {
         btnhistorial.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btnhistorial.setForeground(new java.awt.Color(255, 255, 255));
         btnhistorial.setText("HISTORIAL");
+        btnhistorial.addActionListener(this::btnhistorialActionPerformed);
 
         javax.swing.GroupLayout panelPrincipalLayout = new javax.swing.GroupLayout(panelPrincipal);
         panelPrincipal.setLayout(panelPrincipalLayout);
@@ -189,7 +198,7 @@ public class VistaPrincipal extends javax.swing.JFrame {
                         .addGap(124, 124, 124)
                         .addComponent(btnSalir))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelPrincipalLayout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 122, Short.MAX_VALUE)
                         .addComponent(btnhistorial)
                         .addGap(251, 251, 251))))
         );
@@ -265,6 +274,46 @@ public class VistaPrincipal extends javax.swing.JFrame {
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
 
     }//GEN-LAST:event_btnSalirActionPerformed
+
+    private void btnhistorialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnhistorialActionPerformed
+Usuario u = UsuarioControlador.getUsuarioActual();
+
+    if (u == null) {
+        JOptionPane.showMessageDialog(this, "Debes iniciar sesión primero.");
+        return;
+    }
+
+    List<com.mycompany.orbitix.modelo.HistorialVuelo> lista =
+            HistorialControlador.obtenerHistorial(u);
+
+    if (lista.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "No tienes vuelos registrados.");
+        return;
+    }
+
+    StringBuilder texto = new StringBuilder();
+    texto.append("=== HISTORIAL DE VUELOS ===\n\n");
+
+    for (HistorialVuelo hv : lista) {
+        texto.append("Vuelo: ").append(hv.getCodigoVuelo()).append("\n");
+        texto.append("Ruta: ").append(hv.getOrigen())
+             .append(" -> ").append(hv.getDestino()).append("\n");
+        texto.append("Fecha: ").append(hv.getFecha()).append("\n");
+        texto.append("Asiento: ").append(hv.getAsiento()).append("\n");
+        texto.append("Total pagado: $").append(hv.getTotalPagado()).append("\n");
+        texto.append("-----------------------------\n");
+    }
+
+    JTextArea area = new JTextArea(texto.toString());
+    area.setEditable(false);
+    area.setRows(20);
+    area.setColumns(40);
+
+    JScrollPane scroll = new JScrollPane(area);
+
+    JOptionPane.showMessageDialog(this, scroll, "Mi Historial", JOptionPane.INFORMATION_MESSAGE);
+
+    }//GEN-LAST:event_btnhistorialActionPerformed
 
     /**
      * @param args the command line arguments
