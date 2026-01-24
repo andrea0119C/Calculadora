@@ -14,15 +14,24 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
+import com.mycompany.orbitix.controlador.HistorialControlador;
 
 public class VistaCompra extends JFrame {
 
     private JTextField txtCodigoCompra;
     private JTextField txtTotal;
     private JButton btnCancelarCompra;
+    private Vuelo vueloActual;
+    private List<Pasaje> pasajesActuales;
+    private Usuario usuarioLogueado;
 
     public VistaCompra(JFrame parent, Vuelo vuelo, List<Pasaje> pasajes, Usuario usuario)  {
-        initComponents();
+    initComponents();
+    this.vueloActual = vuelo;
+    this.pasajesActuales = pasajes;
+    this.usuarioLogueado = usuario;
+    cargarResumen(pasajesActuales);
+    
         Fondo fondo = new Fondo("/recursos/fondo_vPrincipal_orbitix.png");
         fondo.setLayout(new java.awt.BorderLayout());
         setContentPane(fondo);
@@ -34,7 +43,7 @@ public class VistaCompra extends JFrame {
         setLocationRelativeTo(null);
     }
 public void cargarResumen(java.util.List<Pasaje> pasajes) {
-    javax.swing.table.DefaultTableModel modelo = new javax.swing.table.DefaultTableModel();
+    DefaultTableModel modelo = new DefaultTableModel();
     modelo.addColumn("Pasajero");
     modelo.addColumn("Asiento");
     modelo.addColumn("Precio");
@@ -314,7 +323,38 @@ public void cargarResumen(java.util.List<Pasaje> pasajes) {
     }//GEN-LAST:event_txtNumTarjeta1ActionPerformed
 
     private void btnPagarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPagarActionPerformed
-        // TODO add your handling code here:
+
+    try {
+        if (usuarioLogueado == null || vueloActual == null || pasajesActuales == null || pasajesActuales.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No hay datos de compra para registrar.");
+            return;
+        }
+
+        // 1) Sacar asientos y total desde los pasajes (tú ya los muestras en la tabla)
+        java.util.List<String> asientosSeleccionados = new java.util.ArrayList<>();
+        double totalFinal = 0;
+
+        for (Pasaje p : pasajesActuales) {
+            asientosSeleccionados.add(p.getAsiento());
+            totalFinal += (p.getPrecio() + p.getRecargo());
+        }
+
+        // 2) Registrar historial (por usuario logueado)
+        HistorialControlador.registrarHistorial(
+            usuarioLogueado,
+            vueloActual,
+            asientosSeleccionados,
+            totalFinal
+        );
+
+        JOptionPane.showMessageDialog(this, "Pago realizado y vuelo registrado en tu historial.");
+
+        // (opcional) cerrar la ventana
+        // this.dispose();
+
+    } catch (Exception ex) {
+        JOptionPane.showMessageDialog(this, "Error al procesar el pago: " + ex.getMessage());
+    }
     }//GEN-LAST:event_btnPagarActionPerformed
 
     /**
