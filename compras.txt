@@ -13,3 +13,5 @@ COM-FC2A4F;1850.00;1729387611;com.mycompany.orbitix.modelo.PagoTarjeta@c7220d9;5
 COM-31B939;85.50;1729387611;com.mycompany.orbitix.modelo.PagoTarjeta@630a1edc;e0660cde-32d0-4e04-b60e-40c5132cdb29
 COM-B38DCE;85.50;1729387611;com.mycompany.orbitix.modelo.PagoTarjeta@581b004e;46060974-e692-48a3-ad4b-337ed26cfdf9
 COM-948BD1;75.00;1729387611;com.mycompany.orbitix.modelo.PagoTarjeta@75ee5621;9aa6da24-800c-40aa-a468-efa73aa41988
+COM-CB1653;122.00;1729387611;com.mycompany.orbitix.modelo.PagoTarjeta@781cb3a8;420e2103-3c12-42f3-a5e7-e5086f6d96e1
+COM-F333E8;400.00;1729387611;com.mycompany.orbitix.modelo.PagoTarjeta@4b10a280;a0c6fdea-2368-4334-8734-882a1404eab0

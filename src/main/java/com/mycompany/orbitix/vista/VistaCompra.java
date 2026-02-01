@@ -24,13 +24,40 @@ public class VistaCompra extends JFrame {
     private Vuelo vueloActual;
     private List<Pasaje> pasajesActuales;
     private Usuario usuarioLogueado;
+    
+    private void habilitarCamposTarjeta(boolean enabled) {
+    txtNumTarjeta1.setEnabled(enabled);
+    txtNumTarjeta.setEnabled(enabled);
+    txtFecha.setEnabled(enabled);
+    txtCVV.setEnabled(enabled);
+
+    if (!enabled) {
+        txtNumTarjeta1.setText("");
+        txtNumTarjeta.setText("");
+        txtFecha.setText("");
+        txtCVV.setText("");
+    }
+}
 
     public VistaCompra(JFrame parent, Vuelo vuelo, List<Pasaje> pasajes, Usuario usuario)  {
     initComponents();
+    habilitarCamposTarjeta(false);
     this.vueloActual = vuelo;
     this.pasajesActuales = pasajes;
     this.usuarioLogueado = usuario;
+    
     cargarResumen(pasajesActuales);
+    
+        rbVisa.addActionListener(e -> {
+        habilitarCamposTarjeta(true);
+        txtNumTarjeta1.requestFocusInWindow();
+    });
+
+    rbMasterCard.addActionListener(e -> {
+        habilitarCamposTarjeta(true);
+        txtNumTarjeta1.requestFocusInWindow();
+    });
+
     
         Fondo fondo = new Fondo("/recursos/fondo_vPrincipal_orbitix.png");
         fondo.setLayout(new java.awt.BorderLayout());

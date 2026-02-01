@@ -14,3 +14,5 @@
 1751307727;Karla;Guaña;0998506529;karla@gmail.com;10
 1751307727;Karla;Guaña;0998506529;karla@gmail.com;10
 1754872701;Alondra;Guaña;0998506529;alondra@gmail.com;5
+1850341627;Paola;Pacheco;0998618483;pao@gmail.com;19
+1850341627;Cecilia;Jimenez;0998618483;j@gmail.com;50
