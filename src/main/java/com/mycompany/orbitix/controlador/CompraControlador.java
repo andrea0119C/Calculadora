@@ -46,6 +46,7 @@ public class CompraControlador implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        if (!vista.validarAntesDePagar()) return;
         realizarPago();
     }
 

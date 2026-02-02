@@ -16,3 +16,6 @@
 1754872701;Alondra;Guaña;0998506529;alondra@gmail.com;5
 1850341627;Paola;Pacheco;0998618483;pao@gmail.com;19
 1850341627;Cecilia;Jimenez;0998618483;j@gmail.com;50
+1850341627;Paola;Pacheco;0994875986;p@gmail.com;18
+1850341627;Emily;Jimenez;0997856195;e@gmail.com;20
+1850341529;Yolanda;Tierres;0984562185;yo@gmail.com;30

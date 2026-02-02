@@ -4,6 +4,14 @@
  */
 package com.mycompany.orbitix.vista;
 
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Locale;
 import com.mycompany.orbitix.modelo.Pasaje;
 import com.mycompany.orbitix.modelo.Usuario;
 import com.mycompany.orbitix.modelo.Vuelo;
@@ -41,20 +49,30 @@ public class VistaCompra extends JFrame {
 
     public VistaCompra(JFrame parent, Vuelo vuelo, List<Pasaje> pasajes, Usuario usuario)  {
     initComponents();
+   
+    ((AbstractDocument) txtNumTarjeta1.getDocument()).setDocumentFilter(new SoloDigitosFilter(19)); // tarjeta
+    ((AbstractDocument) txtCVV.getDocument()).setDocumentFilter(new SoloDigitosFilter(4));          // cvv
+    ((AbstractDocument) txtNumTarjeta.getDocument()).setDocumentFilter(new SoloLetrasYEspaciosFilter(40)); // titular
+    ((AbstractDocument) txtFecha.getDocument()).setDocumentFilter(new FechaMMYYFilter());           // MM/AA
+
     habilitarCamposTarjeta(false);
+    btnPagar.setEnabled(false);
     this.vueloActual = vuelo;
     this.pasajesActuales = pasajes;
     this.usuarioLogueado = usuario;
     
     cargarResumen(pasajesActuales);
     
-        rbVisa.addActionListener(e -> {
+    
+            rbVisa.addActionListener(e -> {
         habilitarCamposTarjeta(true);
+        btnPagar.setEnabled(true); 
         txtNumTarjeta1.requestFocusInWindow();
     });
 
     rbMasterCard.addActionListener(e -> {
         habilitarCamposTarjeta(true);
+        btnPagar.setEnabled(true); 
         txtNumTarjeta1.requestFocusInWindow();
     });
 
@@ -121,6 +139,285 @@ public void cargarResumen(java.util.List<Pasaje> pasajes) {
         txtTotal.setText("");
     }
 
+public boolean validarAntesDePagar() {
+
+    if (!rbVisa.isSelected() && !rbMasterCard.isSelected()) {
+        JOptionPane.showMessageDialog(this,
+                "Debes seleccionar un tipo de tarjeta (VISA o MASTERCARD).",
+                "Tarjeta no seleccionada",
+                JOptionPane.WARNING_MESSAGE);
+        return false;
+    }
+
+    String numeroRaw = txtNumTarjeta1.getText();
+    String titular = txtNumTarjeta.getText(); 
+    String fecha = txtFecha.getText();
+    String cvv = txtCVV.getText();
+
+    if (numeroRaw.trim().isEmpty() || titular.trim().isEmpty() || fecha.trim().isEmpty() || cvv.trim().isEmpty()) {
+        JOptionPane.showMessageDialog(this,
+                "Completa todos los datos de la tarjeta antes de pagar.",
+                "Datos incompletos",
+                JOptionPane.WARNING_MESSAGE);
+        return false;
+    }
+
+    String numero = limpiarNumeroTarjeta(numeroRaw);
+
+    if (!numero.matches("^\\d{13,19}$")) {
+        JOptionPane.showMessageDialog(this,
+                "El número de tarjeta debe tener entre 13 y 19 dígitos.\nPuedes escribirlo con espacios o guiones.",
+                "Número de tarjeta inválido",
+                JOptionPane.WARNING_MESSAGE);
+        txtNumTarjeta1.requestFocusInWindow();
+        return false;
+    }
+
+    if (!esNumeroTarjetaValidoLuhn(numero)) {
+        JOptionPane.showMessageDialog(this,
+                "El número de tarjeta no es válido (falló la verificación).",
+                "Número de tarjeta inválido",
+                JOptionPane.WARNING_MESSAGE);
+        txtNumTarjeta1.requestFocusInWindow();
+        return false;
+    }
+
+    if (!validarNombreTitular(titular)) {
+        JOptionPane.showMessageDialog(this,
+                "El nombre del titular debe contener solo letras y al menos 2 palabras.\nEjemplo: \"Juan Perez\"",
+                "Nombre inválido",
+                JOptionPane.WARNING_MESSAGE);
+        txtNumTarjeta.requestFocusInWindow();
+        return false;
+    }
+
+    if (!validarFechaMMYYNoVencida(fecha)) {
+        JOptionPane.showMessageDialog(this,
+                "La fecha debe estar en formato MM/AA y no puede estar vencida.\nEjemplo: 08/27",
+                "Fecha inválida",
+                JOptionPane.WARNING_MESSAGE);
+        txtFecha.requestFocusInWindow();
+        return false;
+    }
+
+    if (!validarCVV(cvv)) {
+        JOptionPane.showMessageDialog(this,
+                "El CVV debe tener 3 o 4 dígitos.",
+                "CVV inválido",
+                JOptionPane.WARNING_MESSAGE);
+        txtCVV.requestFocusInWindow();
+        return false;
+    }
+
+    if (usuarioLogueado == null || vueloActual == null || pasajesActuales == null || pasajesActuales.isEmpty()) {
+        JOptionPane.showMessageDialog(this,
+                "No hay datos de compra para registrar.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+        return false;
+    }
+
+    return true;
+}
+
+
+public void procesarPagoYRegistrarHistorial() {
+    java.util.List<String> asientosSeleccionados = new java.util.ArrayList<>();
+    double totalFinal = 0;
+
+    for (Pasaje p : pasajesActuales) {
+        asientosSeleccionados.add(p.getAsiento());
+        totalFinal += (p.getPrecio() + p.getRecargo());
+    }
+
+    HistorialControlador.registrarHistorial(
+            usuarioLogueado,
+            vueloActual,
+            asientosSeleccionados,
+            totalFinal
+    );
+
+    JOptionPane.showMessageDialog(this, "Pago realizado y vuelo registrado en tu historial.");
+}
+
+private String limpiarNumeroTarjeta(String input) {
+    if (input == null) return "";
+    return input.replaceAll("[\\s-]", ""); 
+}
+
+private boolean esNumeroTarjetaValidoLuhn(String numero) {
+    
+    int suma = 0;
+    boolean alternar = false;
+
+    for (int i = numero.length() - 1; i >= 0; i--) {
+        int n = numero.charAt(i) - '0';
+        if (alternar) {
+            n *= 2;
+            if (n > 9) n -= 9;
+        }
+        suma += n;
+        alternar = !alternar;
+    }
+    return suma % 10 == 0;
+}
+
+private boolean validarNombreTitular(String nombre) {
+    if (nombre == null) return false;
+    nombre = nombre.trim();
+
+    
+    if (nombre.split("\\s+").length < 2) return false;
+
+    
+    return nombre.matches("^[\\p{L}]+(?:\\s+[\\p{L}]+)+$");
+}
+
+private boolean validarFechaMMYYNoVencida(String fecha) {
+    if (fecha == null) return false;
+    fecha = fecha.trim();
+
+    
+    if (!fecha.matches("^(0[1-9]|1[0-2])\\/\\d{2}$")) return false;
+
+    try {
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("MM/yy", Locale.US);
+        YearMonth ym = YearMonth.parse(fecha, fmt);
+
+        
+        YearMonth actual = YearMonth.now();
+        return !ym.isBefore(actual);
+
+    } catch (DateTimeParseException ex) {
+        return false;
+    }
+}
+
+private boolean validarCVV(String cvv) {
+    if (cvv == null) return false;
+    cvv = cvv.trim();
+
+    
+    return cvv.matches("^\\d{3,4}$");
+}
+
+
+private static class SoloDigitosFilter extends DocumentFilter {
+    private final int maxLen;
+
+    public SoloDigitosFilter(int maxLen) {
+        this.maxLen = maxLen;
+    }
+
+    @Override
+    public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
+            throws BadLocationException {
+        if (string == null) return;
+        reemplazar(fb, offset, 0, string, attr);
+    }
+
+    @Override
+    public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
+            throws BadLocationException {
+        if (text == null) return;
+        reemplazar(fb, offset, length, text, attrs);
+    }
+
+    private void reemplazar(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
+            throws BadLocationException {
+
+        
+        String filtrado = text.replaceAll("\\D", "");
+
+        int currentLen = fb.getDocument().getLength();
+        int newLen = currentLen - length + filtrado.length();
+
+        if (newLen <= maxLen) {
+            super.replace(fb, offset, length, filtrado, attrs);
+        } else {
+        
+            int allowed = maxLen - (currentLen - length);
+            if (allowed > 0) {
+                super.replace(fb, offset, length, filtrado.substring(0, allowed), attrs);
+            }
+        }
+    }
+}
+
+
+private static class SoloLetrasYEspaciosFilter extends DocumentFilter {
+    private final int maxLen;
+
+    public SoloLetrasYEspaciosFilter(int maxLen) {
+        this.maxLen = maxLen;
+    }
+
+    @Override
+    public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
+            throws BadLocationException {
+        if (string == null) return;
+        replace(fb, offset, 0, string, attr);
+    }
+
+    @Override
+    public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
+            throws BadLocationException {
+
+        if (text == null) return;
+
+        
+        String filtrado = text.replaceAll("[^\\p{L}\\s]", "");
+
+        int currentLen = fb.getDocument().getLength();
+        int newLen = currentLen - length + filtrado.length();
+
+        if (newLen <= maxLen) {
+            super.replace(fb, offset, length, filtrado, attrs);
+        } else {
+            int allowed = maxLen - (currentLen - length);
+            if (allowed > 0) {
+                super.replace(fb, offset, length, filtrado.substring(0, allowed), attrs);
+            }
+        }
+    }
+}
+
+private static class FechaMMYYFilter extends DocumentFilter {
+
+    @Override
+    public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
+            throws BadLocationException {
+        if (string == null) return;
+        replace(fb, offset, 0, string, attr);
+    }
+
+    @Override
+    public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
+            throws BadLocationException {
+
+        if (text == null) return;
+
+        String actual = fb.getDocument().getText(0, fb.getDocument().getLength());
+        StringBuilder sb = new StringBuilder(actual);
+        sb.replace(offset, offset + length, text);
+
+        String digits = sb.toString().replaceAll("\\D", "");
+
+        if (digits.length() > 4) digits = digits.substring(0, 4);
+
+       
+        String formateado;
+        if (digits.length() <= 2) {
+            formateado = digits;
+        } else {
+            formateado = digits.substring(0, 2) + "/" + digits.substring(2);
+        }
+
+        if (formateado.length() > 5) formateado = formateado.substring(0, 5);
+
+        fb.replace(0, fb.getDocument().getLength(), formateado, attrs);
+    }
+}
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -350,38 +647,7 @@ public void cargarResumen(java.util.List<Pasaje> pasajes) {
     }//GEN-LAST:event_txtNumTarjeta1ActionPerformed
 
     private void btnPagarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPagarActionPerformed
-        try {
-            if (!rbVisa.isSelected() && !rbMasterCard.isSelected()) {
-                JOptionPane.showMessageDialog(this,
-                "Debes seleccionar un tipo de tarjeta (VISA o MASTERCARD).",
-                "Tarjeta no seleccionada",
-                JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-
-            if (usuarioLogueado == null || vueloActual == null || pasajesActuales == null || pasajesActuales.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "No hay datos de compra para registrar.");
-                return;
-            }
-            java.util.List<String> asientosSeleccionados = new java.util.ArrayList<>();
-            double totalFinal = 0;
-
-            for (Pasaje p : pasajesActuales) {
-                asientosSeleccionados.add(p.getAsiento());
-                totalFinal += (p.getPrecio() + p.getRecargo());
-            }
-            HistorialControlador.registrarHistorial(
-                usuarioLogueado,
-                vueloActual,
-                asientosSeleccionados,
-                totalFinal
-            );
-
-            JOptionPane.showMessageDialog(this, "Pago realizado y vuelo registrado en tu historial.");
-
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error al procesar el pago: " + ex.getMessage());
-        }
+        
     }//GEN-LAST:event_btnPagarActionPerformed
 
     /**
